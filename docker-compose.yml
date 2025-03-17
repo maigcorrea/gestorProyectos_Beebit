@@ -1,0 +1,42 @@
+version: '3'
+
+services:
+  postgres-db:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: usuario
+      POSTGRES_PASSWORD: 123456
+      POSTGRES_DB: midb  # Esta línea crea la base de datos automáticamente
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - app-network  # Conectar a la red app-network
+
+  node-backend:
+    build: ./backend
+    depends_on:
+      - postgres-db
+    environment:
+      - DB_HOST=postgres-db
+      - DB_USER=usuario
+      - DB_PASSWORD=123456
+      - DB_NAME=midb
+    ports:
+      - "3000:3000"
+    networks:
+      - app-network  # Conectar a la misma red
+
+  next-frontend:
+    build: ./frontend
+    ports:
+      - "3001:3001"
+    networks:
+      - app-network  # Conectar a la misma red
+
+networks:
+  app-network:  # Definir la red aquí
+
+volumes:
+  postgres-data:
